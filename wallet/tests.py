@@ -89,7 +89,7 @@ def test_unknown_operation_type():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.uud])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "TEST", "amount": 600}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()

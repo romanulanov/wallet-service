@@ -49,5 +49,5 @@ POST http://127.0.0.1:8000/api/v1/wallets/<WALLET_UUID>/operation/
 Тесты проекта расположены в `wallet/tests.py`. Для их отдельного запуска используйте:
 
 ```sh
-docker-compose run web python manage.py test wallet
+docker-compose run web pytest wallet/tests.py
 ```
