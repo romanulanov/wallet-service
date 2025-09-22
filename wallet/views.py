@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
@@ -27,7 +28,7 @@ class WalletOperationView(APIView):
 
             try:
                 wallet.change_balance(operation_type, Decimal(amount))
-            except Exception as e:
+            except ValidationError as e:
                 return Response(
                     {
                         "error": str(e)
