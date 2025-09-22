@@ -1,9 +1,10 @@
-import pytest
 import uuid
-
-from django.urls import reverse
 from decimal import Decimal
+
+import pytest
+from django.urls import reverse
 from rest_framework.test import APIClient
+
 from .models import Wallet, WalletOperation
 
 
