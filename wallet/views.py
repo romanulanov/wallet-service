@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,27 +13,27 @@ from .serializers import WalletOperationSerializer, WalletSerializer
 
 class WalletDetailsView(APIView):
     def get(self, request, wallet_id):
-        wallet = get_object_or_404(Wallet, pk=wallet_id)
+        wallet = get_object_or_404(Wallet, uuid=wallet_id)
         serializer = WalletSerializer(wallet)
         return Response(serializer.data)
 
 
 class WalletOperationView(APIView):
     def post(self, request, wallet_id):
-        wallet = get_object_or_404(Wallet, pk=wallet_id)
         serializer = WalletOperationSerializer(data=request.data)
-
         if serializer.is_valid():
             operation_type = serializer.validated_data["operation_type"]
             amount = serializer.validated_data["amount"]
 
             try:
-                wallet.change_balance(operation_type, Decimal(amount))
+                with transaction.atomic():
+                    wallet = Wallet.objects.select_for_update().get(
+                        uuid=wallet_id
+                        )
+                    wallet.change_balance(operation_type, Decimal(amount))
             except ValidationError as e:
                 return Response(
-                    {
-                        "error": str(e)
-                    },
+                    {"error": str(e)},
                     status=status.HTTP_400_BAD_REQUEST
                     )
 

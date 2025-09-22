@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
+from django.db import models
 
 
 class Wallet(models.Model):
@@ -38,24 +38,22 @@ class Wallet(models.Model):
     def change_balance(self, operation_type: str, amount: Decimal):
         if amount <= 0:
             raise ValidationError("Сумма должна быть больше 0")
-        with transaction.atomic():
-            wallet = Wallet.objects.select_for_update().get(pk=self.pk)
 
-            if operation_type == "DEPOSIT":
-                wallet.balance += amount
-            elif operation_type == "WITHDRAW":
-                if wallet.balance < amount:
-                    raise ValidationError("Недостаточно средсв")
-                wallet.balance -= amount
-            else:
-                raise ValidationError("Неверный тип операции")
+        if operation_type == "DEPOSIT":
+            self.balance += amount
+        elif operation_type == "WITHDRAW":
+            if self.balance < amount:
+                raise ValidationError("Недостаточно средсв")
+            self.balance -= amount
+        else:
+            raise ValidationError("Неверный тип операции")
 
-            wallet.save()
-            WalletOperation.objects.create(
-                wallet=wallet,
-                operation_type=operation_type,
-                amount=amount,
-            )
+        self.save()
+        WalletOperation.objects.create(
+            wallet=self,
+            operation_type=operation_type,
+            amount=amount,
+        )
 
     def __str__(self):
         return f"Счет №{str(self.uuid)}"
