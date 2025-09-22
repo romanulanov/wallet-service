@@ -27,7 +27,12 @@ class WalletOperationView(APIView):
             try:
                 wallet.change_balance(operation_type, Decimal(amount))
             except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "error": str(e)
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
 
             return Response(WalletSerializer(wallet).data)
 
