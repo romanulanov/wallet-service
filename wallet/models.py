@@ -1,14 +1,15 @@
 import uuid
+
 from decimal import Decimal
 from django.db import models, transaction
 from django.core.exceptions import ValidationError
 
 
 class Wallet(models.Model):
-    id = models.UUIDField(
-        primary_key=True,
+    uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
+        unique=True,
     )
     balance = models.DecimalField(
         verbose_name="Баланс",
@@ -57,7 +58,7 @@ class Wallet(models.Model):
             )
 
     def __str__(self):
-        return f"Счет №{str(self.id)}"
+        return f"Счет №{str(self.uuid)}"
 
 
 class WalletOperation(models.Model):
@@ -66,10 +67,10 @@ class WalletOperation(models.Model):
         ("WITHDRAW", "Списание"),
     ]
 
-    id = models.UUIDField(
-        primary_key=True,
+    uuid = models.UUIDField(
         default=uuid.uuid4,
         editable=False,
+        unique=True,
     )
 
     wallet = models.ForeignKey(
@@ -101,5 +102,5 @@ class WalletOperation(models.Model):
         verbose_name_plural = "Операции"
 
     def __str__(self):
-        return f"Операция {self.operation_type} №{str(self.id)[-6:]} \
-            cо счета {self.wallet.id} на сумму {self.amount}"
+        return f"Операция {self.operation_type} №{str(self.uuid)[-6:]} \
+            cо счета {self.wallet.uuid} на сумму {self.amount}"

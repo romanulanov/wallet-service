@@ -11,7 +11,7 @@ from .models import Wallet, WalletOperation
 def test_create_wallet():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
-    url = reverse("wallet_balance", args=[wallet.id])
+    url = reverse("wallet_balance", args=[wallet.uuid])
     response = client.get(url, format="json")
 
     assert response.status_code == 200
@@ -23,7 +23,7 @@ def test_create_wallet():
 def test_create_blank_wallet():
     client = APIClient()
     wallet = Wallet.objects.create(currency="RUB")
-    url = reverse("wallet_balance", args=[wallet.id])
+    url = reverse("wallet_balance", args=[wallet.uuid])
     response = client.get(url, format="json")
 
     assert response.status_code == 200
@@ -45,7 +45,7 @@ def test_wallet_deposit():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "DEPOSIT", "amount": 1000}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()
@@ -60,7 +60,7 @@ def test_wallet_withdraw():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "WITHDRAW", "amount": 400}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()
@@ -75,7 +75,7 @@ def test_withdraw_more_than_balance():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "WITHDRAW", "amount": 600}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()
@@ -88,7 +88,7 @@ def test_unknown_operation_type():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uud])
     payload = {"operation_type": "TEST", "amount": 600}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()
@@ -103,7 +103,7 @@ def test_several_operations():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "DEPOSIT", "amount": 1000}
     response = client.post(url, payload, format="json")
     payload = {"operation_type": "WITHDRAW", "amount": 100}
@@ -120,7 +120,7 @@ def test_deposit_negative_amount_returns_400():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "DEPOSIT", "amount": -100}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()
@@ -135,7 +135,7 @@ def test_withdraw_negative_amount_returns_400():
     client = APIClient()
     wallet = Wallet.objects.create(balance=500, currency="RUB")
 
-    url = reverse("wallet_operation", args=[wallet.id])
+    url = reverse("wallet_operation", args=[wallet.uuid])
     payload = {"operation_type": "WITHDRAW", "amount": -200}
     response = client.post(url, payload, format="json")
     wallet.refresh_from_db()
